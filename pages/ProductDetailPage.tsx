@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Product, Review } from '../types';
 import { useCart } from '../context/CartContext';
+import { useUser } from '../context/UserContext';
 import Rating from '../components/Rating';
 import { ChevronLeftIcon } from '../components/icons/ChevronLeftIcon';
 import { ShoppingBagIcon } from '../components/icons/ShoppingBagIcon';
@@ -9,14 +10,20 @@ import { ShoppingBagIcon } from '../components/icons/ShoppingBagIcon';
 interface ProductDetailPageProps {
   product: Product;
   onBack: () => void;
+  onLoginRequest: () => void;
 }
 
-const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, onBack }) => {
+const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, onBack, onLoginRequest }) => {
   const [mainImage, setMainImage] = useState(product.images[0]);
   const { dispatch } = useCart();
+  const { state: userState } = useUser();
   
   const handleAddToCart = () => {
-    dispatch({ type: 'ADD_ITEM', payload: product });
+    if (userState.isAuthenticated) {
+      dispatch({ type: 'ADD_ITEM', payload: product });
+    } else {
+      onLoginRequest();
+    }
   };
 
   return (

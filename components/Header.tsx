@@ -1,15 +1,19 @@
 
 import React from 'react';
 import { useCart } from '../context/CartContext';
+import { useUser } from '../context/UserContext';
 import { ShoppingCartIcon } from './icons/ShoppingCartIcon';
+import { UserIcon } from './icons/UserIcon';
 
 interface HeaderProps {
   onViewOrders: () => void;
+  onLogout: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onViewOrders }) => {
-  const { state, dispatch } = useCart();
-  const itemCount = state.items.reduce((total, item) => total + item.quantity, 0);
+const Header: React.FC<HeaderProps> = ({ onViewOrders, onLogout }) => {
+  const { state: cartState, dispatch } = useCart();
+  const { state: userState } = useUser();
+  const itemCount = cartState.items.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <header className="bg-brand-primary sticky top-0 z-30 shadow-md">
@@ -19,6 +23,20 @@ const Header: React.FC<HeaderProps> = ({ onViewOrders }) => {
             LuxeLane
           </a>
           <div className="flex items-center space-x-4">
+            {userState.isAuthenticated && (
+              <>
+                <div className="flex items-center space-x-2 text-gray-300">
+                  <UserIcon className="w-5 h-5"/>
+                  <span className="text-sm font-medium hidden sm:block">Welcome, {userState.user?.name}</span>
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="text-gray-300 hover:text-white transition-colors duration-200 text-sm font-medium"
+                >
+                  Logout
+                </button>
+              </>
+            )}
             <button
               onClick={onViewOrders}
               className="text-gray-300 hover:text-white transition-colors duration-200 text-sm font-medium"
